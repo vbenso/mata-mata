@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Add React in One Minute</title>
+</head>
+
+<body>
+  <div id="twitch-embed"></div>
+
+    <!-- Load the Twitch embed script -->
+    <script src="https://embed.twitch.tv/embed/v1.js"></script>
+
+    <!-- Create a Twitch.Embed object that will render within the "twitch-embed" root element. -->
+   <script type="text/javascript">
+      new Twitch.Embed("twitch-embed", {
+        width: '100%',
+        height: 560,
+        channel: "chesszila",
+        // only needed if your site is also embedded on embed.example.com and othersite.example.com 
+        parent: ["stackblitz.com"],
+        theme: "dark"
+      });
+    </script>
+        
+  <h1> Mata Mata Dia: __/__/__      
+ 
+  <table class="players" id="tabeladeplayers">
+    <thead>
+      <tr>
+        <th class="cabecalho">inscrição</th>
+        <th class="cabecalho">Usuario Chess.com</th>
+        <th class="cabecalho">Rating Chess.com</th>
+        <th class="cabecalho">Usuário Twitch</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th class="conteudo">1</th>
+        <th class="conteudo">Zigaruu</th>
+        <th class="conteudo">1020</th>
+        <th class="conteudo">miguelmds14</th>
+      </tr>
+      <tr>
+        <th class="conteudo">2</th>
+        <th class="conteudo">VictorBenso</th>
+        <th class="conteudo">1350</th>
+        <th class="conteudo">victorbenso</th>
+      </tr>
+      <tr>
+        <th class="conteudo">3</th>
+        <th class="conteudo">RubensCezila</th>
+        <th class="conteudo">2490</th>
+        <th class="conteudo">Chesszila</th>
+      </tr>
+    </tbody>
+  </table>
+
+  <form>
+    Nome do Jogador (chess.com): <input tabindex="1" type="text">
+       <input type="submit" value="Enviar">
+    <form action=target=".conteudo">
+    </input>
+    <br />
+    Nome do Jogador (twitch.tv): <input tabindex="2" type="text">
+   <input type="submit" value="Enviar">
+      <br />
+    Rating (chess.com):<input tabindex="2" type="text">
+   <input type="submit" value="Enviar">
+    </input>
+  </form>
+
+
+  <div id="like_button_container"></div>
+
+  <div id="root"></div> 
+</body>
+
+</html>

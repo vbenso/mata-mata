@@ -1,0 +1,20 @@
+table,
+th,
+td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+th {
+  background-color: lightgrey;
+}
+tr:nth-child(even) .conteudo {
+  background: salmon;
+}
+tr:nth-child(odd) .conteudo {
+  background: darksalmon;
+}
+
+.players{
+   width: 200px;
+ }
+
