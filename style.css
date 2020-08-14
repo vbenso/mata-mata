@@ -3,9 +3,13 @@ th,
 td {
   border: 1px solid black;
   border-collapse: collapse;
+  font-size: 10pt;
+  text-align: center;
 }
 th {
   background-color: lightgrey;
+  font-size:12pt;
+  text-align: center;
 }
 tr:nth-child(even) .conteudo {
   background: salmon;

@@ -4,10 +4,10 @@ import Button from "@material-ui/core/Button";
 import Paper from "@material-ui/core/Paper";
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import ChessWebAPI from 'chess-web-api';
-function PlayerForm() {
+function PlayerForm(props) {
+
   const [userTwitch, setUserTwitch] = React.useState("");
   const [userChess, setUserChess] = React.useState("");
-  const [profileReady, setProfileReady] = React.useState(false);
   //profile from https://api.chess.com/pub/player/rubenscezila
   const [userChessProfile, setUserChessProfile] = React.useState(/*{
     avatar:
@@ -27,58 +27,94 @@ function PlayerForm() {
     is_streamer: true,
     twitch_url: "https://twitch.tv/Chesszila"
   }*/null);
+  const [userChessStats, setUserChessStats] = React.useState(null);
 
   const fieldChanged = event => {
     if (event.target["id"] === "username-twitch") {
       setUserTwitch(event.target.value);
     } else {
-      setProfileReady(false);
       setUserChessProfile(null);
       setUserChess(event.target.value);
     }
     console.log(event);
   };
   const handleFetchClick = () => {
-    debugger;
     var chessAPI = new ChessWebAPI();
     chessAPI.getPlayer(userChess)
     .then( (response) => {
-      //console.log(response.body);
-
       setUserChessProfile(response.body);
-      setProfileReady(true);
-      
-      debugger;
+      const options = {};
+      chessAPI.getPlayerStats(userChess)
+      .then((response)=>{
+        setUserChessStats(response.body);
+      }, (err)=> {
+        console.log(err);
+        setUserChessStats(null);
+        alert('Error fetching stats');
+      });
     }, (err)=> {
       console.log(err);
+      alert('Error fetching profile');
       setUserChessProfile(null);
     })
 
   }
+  
   const handleAddClick = () => {
-    alert("clicked");
     console.log({
       twitch: userTwitch,
       chess: userChess
     });
-    //this.props.handleSubmit(userTwitch, userChess);
+    let rating=1000;
+    try {
+      rating = userChessStats['chess_blitz']['last']['rating'];
+    } 
+    catch(err) {
+
+    }
+    
+    props.onSubmit(userTwitch, userChess, rating, userChessProfile, userChessStats);
   };
   const renderProfile = () => {
     const dummyChessProfile = {
-      avatar:'capivara.svg',
-      title: 'CM',
+      avatar:'https://raw.githubusercontent.com/vbenso/mata-mata/dee26b13da88beec16dc2d93244197aa14568fd1/capivara.svg',
+      title: 'CaPi',
       name: 'Capybara',
-      username: ''
+      username: '' 
     }
+    const dummyChessStats = {
+      chess_blitz: {
+        best: {
+          rating: 1000,
+          date: 1546782667,
+          game: "https://www.chess.com/live/game/3948939005"
+        },
+        last: {
+          rating:1000,
+          date:1546782667,
+          rd:25
+        },
+        record: {
+          win: 100,
+          loss: 20,
+          draw: 30,
+        }
+      }
+    };
     
-    const profile = profileReady?userChessProfile:dummyChessProfile;
+    const profile = userChessProfile?userChessProfile:dummyChessProfile;
+    const stats = userChessStats? userChessStats:dummyChessStats;
     return (
     <>
       <div style={{textAlign:"center", margin:'10px'}}>
         <img src={profile['avatar']} />
       </div>
       <div style={{textAlign:"center"}}>
-        {profile['title']?profile['title']+' ':''  + profile['name']}
+        {profile['title']?profile['title']+' '+profile['name']:profile['name']}
+      </div>
+      
+      <div style={{textAlign:"center"}}>
+        Rating:{stats['chess_blitz']['last']['rating']}
       </div>
     </>
     )
@@ -86,7 +122,6 @@ function PlayerForm() {
   };
   return (
     <Paper>
-      <h2>PlayerForm</h2>
       <form noValidate autoComplete="off">
         <div style={{ display: "flex", flexDirection: "column", width:"220px" }}>
           <TextField
@@ -98,13 +133,12 @@ function PlayerForm() {
           <div style={{ display: "flex", flexDirection: "row" }}>
             <div style={{ display: "flex", flexDirection: "row", alignItems:"baseline" }}>
               <TextField
-                style={{ width: "200px" }}
                 id="username-chess"
                 label="Usuário Chess.com"
                 value={userChess}
                 onChange={fieldChanged}
               />
-              {!profileReady?
+              {!userChessProfile && userChess.length>3?
               <CheckCircleOutlineIcon onClick={handleFetchClick}/>
               :null}
             </div>
@@ -112,10 +146,11 @@ function PlayerForm() {
           <Paper style={{ display:"flex", flexDirection:"column", justifyContent: "center" }}>
             {renderProfile()}
           </Paper>
-
-          <Button variant="outlined" id="submit-form" onClick={handleAddClick}>
+          
+          <Button variant="outlined" id="submit-form" onClick={handleAddClick} disabled={!(userChessStats&&userChessProfile && userTwitch.length>3)}>
             Adicionar
           </Button>
+          
         </div>
       </form>
     </Paper>
