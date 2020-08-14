@@ -5,14 +5,14 @@ import PlayerForm from "./PlayerForm";
 import "./style.css";
 function MatchTable(props) {
   const colors = [
-    'rgb(255,229,153)',
-    'rgb(182,215,168)',
-    'rgb(213,166,189)',
-    'rgb(159,197,232)',
-    'rgb(249,203,156)',
-    'rgb(244,204,204)',
-    'rgb(180,167,214)',
-    'rgb(147,196,125)'
+    "rgb(255,229,153)",
+    "rgb(182,215,168)",
+    "rgb(213,166,189)",
+    "rgb(159,197,232)",
+    "rgb(249,203,156)",
+    "rgb(244,204,204)",
+    "rgb(180,167,214)",
+    "rgb(147,196,125)"
   ];
   const players = props.players;
   debugger;
@@ -34,21 +34,68 @@ function MatchTable(props) {
       </thead>
     );
   };
+  const renderFase = (players, row_idx, fase_idx) => {
+    const color_idx = Math.floor(row_idx / 4);
+    const row_style = {
+      background: colors[color_idx]
+    };
+    if (fase_idx == 1) {
+      //tabela inicial
+      const player = players[fase_idx - 1][row_idx];
+      return (
+        <>
+          <td class="conteudo" style={{ ...row_style }}>
+            {row_idx + 1}
+          </td>
+          <td class="conteudo" style={{ ...row_style }}>
+            {player["twitch"]}
+          </td>
+          <td class="conteudo" style={{ ...row_style }}>
+            {player["chess"]}
+          </td>
+          <td class="conteudo" style={{ ...row_style }}>
+            {player["rating"]}
+          </td>
+        </>
+      );
+    }
+    
+      const N = 2 ** (fase_idx - 1);
+      let player = 
+      {
+        twitch: "",
+        chess: "",
+        rating: 0
+      };
+      const new_row_idx = Math.floor(row_idx / N);
+      try {
+        player = players[fase_idx - 1][new_row_idx];
+      } catch(e) {
+
+      }
+      if (fase_idx>1) {
+        if (row_idx % N == 0) {
+          return (
+            <td rowSpan={N} class="conteudo" style={{ ...row_style }}>
+              {player?player['chess']:'fase_idx='+fase_idx+',new_row_idx='+new_row_idx}
+            </td>
+          );
+        }
+      }
+  };
   const renderRows = players => {
     debugger;
     return (
       <tbody>
-        {players.map((player, idx) => {
-          const color_idx = Math.floor(idx/4);
-          const row_style = {
-            background: colors[color_idx]
-          }
+        {players[0].map((player, idx) => {
+          const fases = [1, 2, 3, 4, 5, 6];
           return (
             <tr>
-              <td class="conteudo" style={{...row_style}}>{idx + 1}</td>
-              <td class="conteudo" style={{...row_style}}>{player["twitch"]}</td>
-              <td class="conteudo" style={{...row_style}}>{player["chess"]}</td>
-              <td class="conteudo" style={{...row_style}}>{player["rating"]}</td>
+              <>
+                {fases.map(fase_idx => {
+                  return renderFase(players, idx, fase_idx);
+                })}
+              </>
             </tr>
           );
         })}
@@ -64,7 +111,7 @@ function MatchTable(props) {
   );
 }
 function App() {
-  const dummy_data = [
+  const dummy_data1 = [
     {
       twitch: "gaabroo92",
       chess: "BrazilianSwag",
@@ -226,18 +273,114 @@ function App() {
       rating: 265
     }
   ];
-  const [players, setPlayers] = React.useState(dummy_data);
+  const dummy_data2 = [{
+        twitch: "a",
+        chess: "Winner 1/1",
+        rating: 2506
+      },
+      {
+        twitch: "b",
+        chess: "Winner 1/2",
+        rating: 2506
+      },
+      {
+        twitch: "c",
+        chess: "Winner 1/3",
+        rating: 2506
+      },
+      {
+        twitch: "d",
+        chess: "Winner 1/4",
+        rating: 2506
+      }];
+  const dummy_data3 = [{
+        twitch: "a",
+        chess: "Winner 2/1",
+        rating: 2506
+      },
+      {
+        twitch: "b",
+        chess: "Winner 2/2",
+        rating: 2506
+      },
+      {
+        twitch: "c",
+        chess: "Winner 2/3",
+        rating: 2506
+      },
+      {
+        twitch: "d",
+        chess: "Winner 2/4",
+        rating: 2506
+      },{
+        twitch: "a",
+        chess: "Winner 2/5",
+        rating: 2506
+      },
+      {
+        twitch: "b",
+        chess: "Winner 2/6",
+        rating: 2506
+      },
+      {
+        twitch: "c",
+        chess: "Winner 2/7",
+        rating: 2506
+      },
+      {
+        twitch: "d",
+        chess: "Winner 2/8",
+        rating: 2506
+      }];
+  const dummy_data4 = [{
+        twitch: "a",
+        chess: "Winner 3/1",
+        rating: 2506
+      },
+      {
+        twitch: "b",
+        chess: "Winner 3/2",
+        rating: 2506
+      },
+      {
+        twitch: "c",
+        chess: "Winner 3/3",
+        rating: 2506
+      },
+      {
+        twitch: "d",
+        chess: "Winner 3/4",
+        rating: 2506
+      }];
+
+  const dummy_data5 = [{
+        twitch: "a",
+        chess: "Winner 4/1",
+        rating: 2506
+      },
+      {
+        twitch: "b",
+        chess: "Winner 4/2",
+        rating: 2506
+      }];
+
+  const dummy_data6 = [{
+        twitch: "a",
+        chess: "Winner 5/1",
+        rating: 2506
+      }];
+  const [players, setPlayers] = React.useState([dummy_data1, dummy_data2, dummy_data3, dummy_data4, dummy_data5, dummy_data6]);
   const handleSubmit = (twitch, chess, rating, chessProfile, chessStats) => {
     debugger;
     let new_players = [...players];
-    new_players.push({
+    new_players[0].push({
       twitch: twitch,
       chess: chess,
       rating: rating,
       chessProfile: chessProfile,
       chessStats: chessStats
     });
-    new_players = new_players
+    new_players[0] = new_players[0]
       .sort((a, b) => {
         debugger;
         if (a["rating"] > b["rating"]) {
