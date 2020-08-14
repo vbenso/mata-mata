@@ -4,7 +4,7 @@ import Hello from "./Hello";
 import PlayerForm from "./PlayerForm";
 import "./style.css";
 import NextIcon from "@material-ui/icons/CheckCircleOutline";
-import ChevronRightIcon from '@material-ui/icons/PlayArrow';
+import PlayArrow from '@material-ui/icons/PlayArrow';
 
 const colors = [
   "rgb(255,229,153)",
@@ -118,7 +118,12 @@ function MatchTable(props) {
           </td>
           {row_idx%2==0?(
             <td rowSpan="2" style={{borderLeft: '3px solid black', borderRight: '3px solid black',backgroundColor:'lightgrey'}}>
-              <ChevronRightIcon style={{backgroundColor:'lightgrey'}}/>
+              <div>
+                <div>0.5 x 0.5</div>
+                <div>0.5 x 0.5</div>
+                <div>0.5 x 0.5</div>
+              </div>
+              {/*<PlayArrow style={{backgroundColor:'lightgrey'}}/>*/}
             </td>
             ):null}
         </>
@@ -153,6 +158,9 @@ function MatchTable(props) {
             if(me['rating']>opponent['rating']) {
               secs = secs - (me['rating']-opponent['rating'])/150*30;
             }
+            if(secs<30) {
+              secs = 30;
+            }
             return secs;
           }
           if(new_row_idx%2==0) { 
@@ -164,18 +172,14 @@ function MatchTable(props) {
               <br/> 
               {'('+player["rating"]+') '}
               <FormatTime sec={adjusted_time}/>
-              <br/>
-              {opponent?opponent['chess']:''}
             </>;
           } else {
             opponent = players[fase_idx-1][new_row_idx-1];
             if(opponent)
               adjusted_time = adjust_time(player, opponent, adjusted_time);
             content = <>
-              {opponent?opponent['chess']:''}
-              <br/>
               {'('+player["rating"]+') '}
-                            <FormatTime sec={adjusted_time}/>
+              <FormatTime sec={adjusted_time}/>
               <br/> 
               {player["chess"]}
             </>;
@@ -198,7 +202,12 @@ function MatchTable(props) {
             </td>
             {new_row_idx%2==0 && fase_idx<=L?(
               <td rowSpan={N*2} style={{borderBottom: '3px solid black', borderLeft: '3px solid black', borderRight: '3px solid black', backgroundColor:'lightgrey'}}>
-              <ChevronRightIcon style={{backgroundColor:'lightgrey'}}/>
+              {/*<PlayArrow style={{backgroundColor:'lightgrey'}}/>*/}
+              <div>
+                <div>0.5 x 0.5</div>
+                <div>0.5 x 0.5</div>
+                <div>0.5 x 0.5</div>
+              </div>
               </td>
             ):null}
             </>
@@ -412,113 +421,6 @@ function App() {
   dummy_data1 = dummy_data1.filter((val, idx) => {
     return idx < 27;
   });
-  const dummy_data2 = [
-    {
-      twitch: "a",
-      chess: "Winner 1/1",
-      rating: 2506
-    },
-    {
-      twitch: "b",
-      chess: "Winner 1/2",
-      rating: 2506
-    },
-    {
-      twitch: "c",
-      chess: "Winner 1/3",
-      rating: 2506
-    },
-    {
-      twitch: "d",
-      chess: "Winner 1/4",
-      rating: 2506
-    }
-  ];
-  const dummy_data3 = [
-    {
-      twitch: "a",
-      chess: "Winner 2/1",
-      rating: 2506
-    },
-    {
-      twitch: "b",
-      chess: "Winner 2/2",
-      rating: 2506
-    },
-    {
-      twitch: "c",
-      chess: "Winner 2/3",
-      rating: 2506
-    },
-    {
-      twitch: "d",
-      chess: "Winner 2/4",
-      rating: 2506
-    },
-    {
-      twitch: "a",
-      chess: "Winner 2/5",
-      rating: 2506
-    },
-    {
-      twitch: "b",
-      chess: "Winner 2/6",
-      rating: 2506
-    },
-    {
-      twitch: "c",
-      chess: "Winner 2/7",
-      rating: 2506
-    },
-    {
-      twitch: "d",
-      chess: "Winner 2/8",
-      rating: 2506
-    }
-  ];
-  const dummy_data4 = [
-    {
-      twitch: "a",
-      chess: "Winner 3/1",
-      rating: 2506
-    },
-    {
-      twitch: "b",
-      chess: "Winner 3/2",
-      rating: 2506
-    },
-    {
-      twitch: "c",
-      chess: "Winner 3/3",
-      rating: 2506
-    },
-    {
-      twitch: "d",
-      chess: "Winner 3/4",
-      rating: 2506
-    }
-  ];
-
-  const dummy_data5 = [
-    {
-      twitch: "a",
-      chess: "Winner 4/1",
-      rating: 2506
-    },
-    {
-      twitch: "b",
-      chess: "Winner 4/2",
-      rating: 2506
-    }
-  ];
-
-  const dummy_data6 = [
-    {
-      twitch: "a",
-      chess: "Winner 5/1",
-      rating: 2506
-    }
-  ];
 
   let new_players = [dummy_data1];
 
