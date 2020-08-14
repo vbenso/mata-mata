@@ -3,97 +3,233 @@ import { render } from "react-dom";
 import Hello from "./Hello";
 import PlayerForm from "./PlayerForm";
 import "./style.css";
+import NextIcon from "@material-ui/icons/CheckCircleOutline";
+import ChevronRightIcon from '@material-ui/icons/PlayArrow';
+
+const colors = [
+  "rgb(255,229,153)",
+  "rgb(182,215,168)",
+  "rgb(213,166,189)",
+  "rgb(159,197,232)",
+  "rgb(249,203,156)",
+  "rgb(244,204,204)",
+  "rgb(180,167,214)",
+  "rgb(147,196,125)",
+  "rgb(255,229,153)",
+  "rgb(182,215,168)",
+  "rgb(213,166,189)",
+  "rgb(159,197,232)",
+  "rgb(249,203,156)",
+  "rgb(244,204,204)",
+  "rgb(180,167,214)",
+  "rgb(147,196,125)",
+  "rgb(255,229,153)",
+  "rgb(182,215,168)",
+  "rgb(213,166,189)",
+  "rgb(159,197,232)",
+  "rgb(249,203,156)",
+  "rgb(244,204,204)",
+  "rgb(180,167,214)",
+  "rgb(147,196,125)",
+  "rgb(255,229,153)",
+  "rgb(182,215,168)",
+  "rgb(213,166,189)",
+  "rgb(159,197,232)",
+  "rgb(249,203,156)",
+  "rgb(244,204,204)",
+  "rgb(180,167,214)",
+  "rgb(147,196,125)"
+];
+
+function FormatTime(props) {
+  const secs = ''+Math.ceil(props.sec%60);
+  return Math.floor(props.sec/60)+":"+(secs.length>1?secs:'0'+secs);
+}
+
 function MatchTable(props) {
-  const colors = [
-    "rgb(255,229,153)",
-    "rgb(182,215,168)",
-    "rgb(213,166,189)",
-    "rgb(159,197,232)",
-    "rgb(249,203,156)",
-    "rgb(244,204,204)",
-    "rgb(180,167,214)",
-    "rgb(147,196,125)"
-  ];
   const players = props.players;
-  debugger;
-  const renderHeader = () => {
-    debugger;
+  const advance = props.advance;
+  const renderHeader = players => {
+    const L = Math.ceil(Math.log2(players[0].length));
     return (
       <thead>
         <tr>
           <th class="cabecalho" />
           <th class="cabecalho">Twitch</th>
-          <th class="cabecalho">Chess.com</th>
-          <th class="cabecalho">Rating</th>
-          <th class="cabecalho">Group Final</th>
-          <th class="cabecalho">Quartas</th>
-          <th class="cabecalho">Semi</th>
-          <th class="cabecalho">Final</th>
-          <th class="cabecalho">Campeão</th>
+          <th  colSpan="2" class="cabecalho">Chess.com</th>
+          {L > 5 ? <th colSpan="2" class="cabecalho">Group Final</th> : null}
+          {L > 4 ? <th colSpan="2" class="cabecalho">Oitavas</th> : null}
+          {L > 3 ? <th colSpan="2" class="cabecalho">Quartas</th> : null}
+          {L > 2 ? <th colSpan="2" class="cabecalho">Semi</th> : null}
+          {L > 1 ? <th colSpan="2" class="cabecalho">Final</th> : null}
+          {L > 0 ? <th class="cabecalho">Campeão</th> : null}
         </tr>
       </thead>
     );
   };
   const renderFase = (players, row_idx, fase_idx) => {
-    const color_idx = Math.floor(row_idx / 4);
-    const row_style = {
-      background: colors[color_idx]
-    };
+    const L = Math.ceil(Math.log2(players[0].length));
     if (fase_idx == 1) {
       //tabela inicial
-      const player = players[fase_idx - 1][row_idx];
+      let player;
+      try {
+        player = players[fase_idx - 1][row_idx];
+      } catch (e) {}
+      if (!player) {
+        player = {
+          twitch: "",
+          chess: "",
+          rating: 0,
+          row_style: {
+            background: "rgb(255,255,255)"
+          }
+        };
+      }
+
+      const row_style = player["row_style"]
+        ? player["row_style"]
+        : { background: "rgb(255,255,255)" };
       return (
         <>
-          <td class="conteudo" style={{ ...row_style }}>
+          <td style={{ ...row_style }}>
             {row_idx + 1}
           </td>
-          <td class="conteudo" style={{ ...row_style }}>
+          <td style={{ ...row_style }}>
             {player["twitch"]}
           </td>
-          <td class="conteudo" style={{ ...row_style }}>
-            {player["chess"]}
+          
+          <td style={{ ...row_style }}>
+            <div style={{ display: "flex", flexDirection: "row" }}>
+              <div style={{ flex: 1 }}>
+                  <div>
+                  <>
+                    {player["chess"]}
+                    <br/> 
+                    {'('+player["rating"]+')'}
+                  </>
+                  </div>
+                </div>
+              <NextIcon
+                onClick={() => {
+                  advance(row_idx, fase_idx - 1);
+                }}
+              />
+            </div>
           </td>
-          <td class="conteudo" style={{ ...row_style }}>
-            {player["rating"]}
-          </td>
+          {row_idx%2==0?(
+            <td rowSpan="2" style={{borderLeft: '3px solid black', borderRight: '3px solid black',backgroundColor:'lightgrey'}}>
+              <ChevronRightIcon style={{backgroundColor:'lightgrey'}}/>
+            </td>
+            ):null}
         </>
       );
-    }
-    
+    } else {
       const N = 2 ** (fase_idx - 1);
-      let player = 
-      {
-        twitch: "",
-        chess: "",
-        rating: 0
-      };
       const new_row_idx = Math.floor(row_idx / N);
+      let player = undefined;
+      let row_style = { background: "rgb(255,255,255)" };
       try {
         player = players[fase_idx - 1][new_row_idx];
-      } catch(e) {
-
+      } catch (e) {}
+      if (player) {
+        row_style = player["row_style"];
       }
-      if (fase_idx>1) {
-        if (row_idx % N == 0) {
+    
+      if (row_idx % N == 0) {
+        row_style = {
+              ...row_style, 
+              borderRight: '3px solid black'
+              };
+        if(row_idx%(N*2)!=0)
+            row_style = {
+              ...row_style, 
+              borderBottom: '3px solid black'
+              };
+        if (player) {
+          let adjusted_time = 180;
+          let opponent;
+          let content;
+          const adjust_time = (me, opponent, secs) => {
+            if(me['rating']>opponent['rating']) {
+              secs = secs - (me['rating']-opponent['rating'])/150*30;
+            }
+            return secs;
+          }
+          if(new_row_idx%2==0) { 
+            opponent = players[fase_idx-1][new_row_idx+1];
+            if(opponent)
+              adjusted_time = adjust_time(player, opponent, adjusted_time);
+            content = <>
+              {player["chess"]}
+              <br/> 
+              {'('+player["rating"]+') '}
+              <FormatTime sec={adjusted_time}/>
+              <br/>
+              {opponent?opponent['chess']:''}
+            </>;
+          } else {
+            opponent = players[fase_idx-1][new_row_idx-1];
+            if(opponent)
+              adjusted_time = adjust_time(player, opponent, adjusted_time);
+            content = <>
+              {opponent?opponent['chess']:''}
+              <br/>
+              {'('+player["rating"]+') '}
+                            <FormatTime sec={adjusted_time}/>
+              <br/> 
+              {player["chess"]}
+            </>;
+          }
           return (
-            <td rowSpan={N} class="conteudo" style={{ ...row_style }}>
-              {player?player['chess']:'fase_idx='+fase_idx+',new_row_idx='+new_row_idx}
+            <>
+            <td rowSpan={N} style={{ ...row_style }}>
+              <div style={{ display: "flex", flexDirection: "row" }}>
+                <div style={{ flex: 1 }}>
+                  <div>
+                  {content}
+                  </div>
+                </div>
+                <NextIcon
+                  onClick={() => {
+                    advance(new_row_idx, fase_idx - 1);
+                  }}
+                />
+              </div>
             </td>
+            {new_row_idx%2==0 && fase_idx<=L?(
+              <td rowSpan={N*2} style={{borderBottom: '3px solid black', borderLeft: '3px solid black', borderRight: '3px solid black', backgroundColor:'lightgrey'}}>
+              <ChevronRightIcon style={{backgroundColor:'lightgrey'}}/>
+              </td>
+            ):null}
+            </>
+          );
+        } else {
+          return (
+            <td colSpan="2"/>
           );
         }
       }
+    }
   };
   const renderRows = players => {
-    debugger;
+    const n_fases = Math.ceil(Math.log2(players[0].length));
+    const n_slots = 2 ** n_fases;
+    let idx_vector = [];
+    for (let i = 0; i < n_slots; i++) {
+      idx_vector.push(i);
+    }
     return (
       <tbody>
-        {players[0].map((player, idx) => {
-          const fases = [1, 2, 3, 4, 5, 6];
+        {idx_vector.map(player_idx => {
+          let fases = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+          fases = fases.filter(val => {
+            return val - 1 <= n_fases;
+          });
           return (
             <tr>
               <>
                 {fases.map(fase_idx => {
-                  return renderFase(players, idx, fase_idx);
+                  return renderFase(players, player_idx, fase_idx);
                 })}
               </>
             </tr>
@@ -105,13 +241,13 @@ function MatchTable(props) {
   debugger;
   return (
     <table>
-      {renderHeader()}
+      {renderHeader(players)}
       {renderRows(players)}
     </table>
   );
 }
 function App() {
-  const dummy_data1 = [
+  let dummy_data1 = [
     {
       twitch: "gaabroo92",
       chess: "BrazilianSwag",
@@ -273,103 +409,132 @@ function App() {
       rating: 265
     }
   ];
-  const dummy_data2 = [{
-        twitch: "a",
-        chess: "Winner 1/1",
-        rating: 2506
-      },
-      {
-        twitch: "b",
-        chess: "Winner 1/2",
-        rating: 2506
-      },
-      {
-        twitch: "c",
-        chess: "Winner 1/3",
-        rating: 2506
-      },
-      {
-        twitch: "d",
-        chess: "Winner 1/4",
-        rating: 2506
-      }];
-  const dummy_data3 = [{
-        twitch: "a",
-        chess: "Winner 2/1",
-        rating: 2506
-      },
-      {
-        twitch: "b",
-        chess: "Winner 2/2",
-        rating: 2506
-      },
-      {
-        twitch: "c",
-        chess: "Winner 2/3",
-        rating: 2506
-      },
-      {
-        twitch: "d",
-        chess: "Winner 2/4",
-        rating: 2506
-      },{
-        twitch: "a",
-        chess: "Winner 2/5",
-        rating: 2506
-      },
-      {
-        twitch: "b",
-        chess: "Winner 2/6",
-        rating: 2506
-      },
-      {
-        twitch: "c",
-        chess: "Winner 2/7",
-        rating: 2506
-      },
-      {
-        twitch: "d",
-        chess: "Winner 2/8",
-        rating: 2506
-      }];
-  const dummy_data4 = [{
-        twitch: "a",
-        chess: "Winner 3/1",
-        rating: 2506
-      },
-      {
-        twitch: "b",
-        chess: "Winner 3/2",
-        rating: 2506
-      },
-      {
-        twitch: "c",
-        chess: "Winner 3/3",
-        rating: 2506
-      },
-      {
-        twitch: "d",
-        chess: "Winner 3/4",
-        rating: 2506
-      }];
+  dummy_data1 = dummy_data1.filter((val, idx) => {
+    return idx < 27;
+  });
+  const dummy_data2 = [
+    {
+      twitch: "a",
+      chess: "Winner 1/1",
+      rating: 2506
+    },
+    {
+      twitch: "b",
+      chess: "Winner 1/2",
+      rating: 2506
+    },
+    {
+      twitch: "c",
+      chess: "Winner 1/3",
+      rating: 2506
+    },
+    {
+      twitch: "d",
+      chess: "Winner 1/4",
+      rating: 2506
+    }
+  ];
+  const dummy_data3 = [
+    {
+      twitch: "a",
+      chess: "Winner 2/1",
+      rating: 2506
+    },
+    {
+      twitch: "b",
+      chess: "Winner 2/2",
+      rating: 2506
+    },
+    {
+      twitch: "c",
+      chess: "Winner 2/3",
+      rating: 2506
+    },
+    {
+      twitch: "d",
+      chess: "Winner 2/4",
+      rating: 2506
+    },
+    {
+      twitch: "a",
+      chess: "Winner 2/5",
+      rating: 2506
+    },
+    {
+      twitch: "b",
+      chess: "Winner 2/6",
+      rating: 2506
+    },
+    {
+      twitch: "c",
+      chess: "Winner 2/7",
+      rating: 2506
+    },
+    {
+      twitch: "d",
+      chess: "Winner 2/8",
+      rating: 2506
+    }
+  ];
+  const dummy_data4 = [
+    {
+      twitch: "a",
+      chess: "Winner 3/1",
+      rating: 2506
+    },
+    {
+      twitch: "b",
+      chess: "Winner 3/2",
+      rating: 2506
+    },
+    {
+      twitch: "c",
+      chess: "Winner 3/3",
+      rating: 2506
+    },
+    {
+      twitch: "d",
+      chess: "Winner 3/4",
+      rating: 2506
+    }
+  ];
 
-  const dummy_data5 = [{
-        twitch: "a",
-        chess: "Winner 4/1",
-        rating: 2506
-      },
-      {
-        twitch: "b",
-        chess: "Winner 4/2",
-        rating: 2506
-      }];
+  const dummy_data5 = [
+    {
+      twitch: "a",
+      chess: "Winner 4/1",
+      rating: 2506
+    },
+    {
+      twitch: "b",
+      chess: "Winner 4/2",
+      rating: 2506
+    }
+  ];
 
-  const dummy_data6 = [{
-        twitch: "a",
-        chess: "Winner 5/1",
-        rating: 2506
-      }];
-  const [players, setPlayers] = React.useState([dummy_data1, dummy_data2, dummy_data3, dummy_data4, dummy_data5, dummy_data6]);
+  const dummy_data6 = [
+    {
+      twitch: "a",
+      chess: "Winner 5/1",
+      rating: 2506
+    }
+  ];
+
+  let new_players = [dummy_data1];
+
+    new_players[0] = new_players[0].map((player, row_idx) => {
+      const color_idx = Math.floor(row_idx / 2);
+      const row_style = {
+        background: colors[color_idx]
+      };
+      return {
+        ...player,
+        row_style: row_style
+      };
+    });
+    
+
+  const [players, setPlayers] = React.useState(new_players);
   const handleSubmit = (twitch, chess, rating, chessProfile, chessStats) => {
     debugger;
     let new_players = [...players];
@@ -382,7 +547,6 @@ function App() {
     });
     new_players[0] = new_players[0]
       .sort((a, b) => {
-        debugger;
         if (a["rating"] > b["rating"]) {
           return 1;
         } else if (a["rating"] < b["rating"]) {
@@ -391,11 +555,32 @@ function App() {
         return 0;
       })
       .reverse();
+
+    new_players[0] = new_players[0].map((player, row_idx) => {
+      const color_idx = Math.floor(row_idx / 2);
+      const row_style = {
+        background: colors[color_idx]
+      };
+      return {
+        ...player,
+        row_style: row_style
+      };
+    });
+    setPlayers(new_players);
+  };
+  const handleAdvanceClick = (row_idx, fase_idx) => {
+    debugger;
+    let new_players = [...players];
+    const next_row_idx = Math.floor(row_idx / 2);
+    if (!new_players[fase_idx + 1]) {
+      new_players[fase_idx + 1] = [];
+    }
+    new_players[fase_idx + 1][next_row_idx] = players[fase_idx][row_idx];
     setPlayers(new_players);
   };
   return (
     <>
-      <MatchTable players={players} />
+      <MatchTable players={players} advance={handleAdvanceClick} />
       <PlayerForm onSubmit={handleSubmit} />
     </>
   );

@@ -1,14 +1,17 @@
 table,
-th,
+th {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
 td {
-  border: 1px solid black;
   border-collapse: collapse;
-  font-size: 10pt;
+  font-size: 12pt;
+  font-family: 'helvetica';
   text-align: center;
 }
 th {
   background-color: lightgrey;
-  font-size:12pt;
+  font-size:14pt;
   text-align: center;
 }
 tr:nth-child(even) .conteudo {
